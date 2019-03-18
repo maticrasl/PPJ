@@ -216,7 +216,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
@@ -226,12 +225,12 @@
       <window_info content_ui="combo" id="Project" order="5" weight="0.2496112" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
-      <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.50075644" side_tool="true" weight="0.16503268" />
       <window_info anchor="bottom" id="Messages" order="2" weight="0.32843137" />
       <window_info anchor="bottom" id="Version Control" order="3" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Find" order="5" />
-      <window_info active="true" anchor="bottom" id="Run" order="6" visible="true" weight="0.16503268" />
+      <window_info anchor="bottom" id="Run" order="6" sideWeight="0.49924356" weight="0.16503268" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
