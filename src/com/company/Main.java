@@ -21,10 +21,28 @@ public class Main {
         Artikel B = new Artikel("5226950246132", "Metla", 15.0f, 22.0f);
         Artikel C = new Artikel("1234987908454", "Nogavice", 2.99f, 22.0f);
 
+        Artikel Ar1 = new Artikel("4729520501323", "CEDEVITA POMARANCA", 5.79f, 22);
+        Artikel Ar2 = new Artikel("1234567890123", "BISKVIT JAFFA DU", 1.54f, 22);
+        Artikel Ar3 = new Artikel("2345678901234", "JAJCA VD KAKOV.A", 1.47f, 22);
+        Artikel Ar4 = new Artikel("3456789012345", "BISKVIT JAFFA", 0.59f, 22);
+        Artikel Ar5 = new Artikel("4567890123456", "MOKA VD PŠENI.BE", 0.54f, 22);
+        Artikel Ar6 = new Artikel("5678901234567", "MLEKO VD 3,5%MM", 0.72f, 22);
+        Artikel Ar7 = new Artikel("6789012345678", "KRUH ŠTRUCA BELA", 0.62f, 22);
+        Artikel Ar8 = new Artikel("7890123456789", "TUŠGEL AXE AFRIC", 2.48f, 22);
+
         Artikli A1 = new Artikli();
-        A1.addArtikel(A, 1);
-        A1.addArtikel(B, 3);
-        Racun R1 = new Racun(A1, "Blaz Satler");
+        A1.addArtikel(Ar1, 1);
+        A1.addArtikel(Ar2, 1);
+        A1.addArtikel(Ar3, 1);
+        A1.addArtikel(Ar2, -1);
+        A1.addArtikel(Ar4, 1);
+        A1.addArtikel(Ar4, 1);
+        A1.addArtikel(Ar5, 1);
+        A1.addArtikel(Ar6, 1);
+        A1.addArtikel(Ar6, 1);
+        A1.addArtikel(Ar7, 1);
+        A1.addArtikel(Ar8, 1);
+        Racun R1 = new Racun(A1, "Sabina K.");
         Artikli A2 = new Artikli();
         A2.addArtikel(C, 4);
         A2.addArtikel(A, 2);
@@ -43,12 +61,13 @@ public class Main {
         List<Racun> racuni = new ArrayList<>();
         racuni.add(R1);
         racuni.add(R2);
-        for (Racun R : racuni
-             ) {
+        for (Racun R : racuni) {
             System.out.print(R.toString());
         }
         System.out.println(A.checkDigit("6291041500213"));
         System.out.println(A.checkDigit("6291041500214"));
+        System.out.println(A.search("scet"));
+        System.out.println(A.search("23"));
     }
 }
 

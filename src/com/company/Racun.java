@@ -157,8 +157,8 @@ public class Racun implements Searchable {
         this.cenaZDDV = (float)((int)(cenaZDDV *100f ))/100f;
     }
     public boolean search(String s) {
-        if(s.contains(String.valueOf(cenaBrezDDV)) || s.contains(String.valueOf(cenaZDDV)) ||
-            s.contains(String.valueOf(id)) || s.contains(prodajalec) || s.contains(String.valueOf(datum)) || s.contains(String.valueOf(davcnaStPodjetja)))
+        if(String.valueOf(cenaBrezDDV).contains(s) || String.valueOf(cenaZDDV).contains(s) ||
+                String.valueOf(id).contains(s) || prodajalec.contains(s) || String.valueOf(datum).contains(s) || String.valueOf(davcnaStPodjetja).contains(s))
             return true;
         return false;
     }

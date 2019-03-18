@@ -157,8 +157,8 @@ public class Artikel implements Searchable {
     }
 
     public boolean search(String s) {
-        if(s.contains(String.valueOf(id)) || s.contains(EAN) || s.contains(ime) || s.contains(String.valueOf(cenaZDDV)) ||
-                s.contains(String.valueOf(cenaBrezDDV)) || s.contains(String.valueOf(DDV)))
+        if(String.valueOf(id).contains(s) || EAN.contains(s) || ime.contains(s) || String.valueOf(cenaZDDV).contains(s) ||
+                String.valueOf(cenaBrezDDV).contains(s) || String.valueOf(DDV).contains(s))
             return true;
         return false;
     }

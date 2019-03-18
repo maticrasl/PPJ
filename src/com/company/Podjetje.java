@@ -80,8 +80,8 @@ public class Podjetje implements Searchable {
     }
 
     public boolean search(String s) {
-        if(s.contains(ime) || s.contains(telSt) || s.contains(email) || s.contains(String.valueOf(davcnaSt)) ||
-            s.contains(String.valueOf(maticnaSt)) || s.contains(String.valueOf(davcniZavezanec)))
+        if(ime.contains(s) || telSt.contains(s) || email.contains(s) || String.valueOf(davcnaSt).contains(s) ||
+                String.valueOf(maticnaSt).contains(s) || String.valueOf(davcniZavezanec).contains(s))
             return true;
         return false;
     }
