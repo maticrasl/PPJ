@@ -15,11 +15,70 @@ public class Artikli {
     }
     private List<posamezniArtikel> seznam = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        String izpis = "ID\tEAN\tDrzava\tNaziv\tCena brez DDV\tDDV\tCena z DDV\tKolicina\n";
-        for(int i = 0; i < seznam.size(); i++)
-            izpis += seznam.get(i).artikel.toString() + '\t' + String.valueOf(seznam.get(i).kolicina) + '\n';
+    public String izpisPosameznegaArtikla(Artikel a, int longestDrzava, int longestNaziv, int longestId) {
+        String izpis;
+        izpis = String.valueOf(a.getId()) + '\t';
+        for(int i = 0; i < (longestId / 4) - (String.valueOf(a.getId()).length() / 4); i++)
+            izpis += '\t';
+        izpis += a.getEAN() + '\t' + a.getDrzava() + '\t';
+        for(int i = 0; i < (longestDrzava / 4) - (a.getDrzava().length() / 4); i++)
+            izpis += '\t';
+        izpis += a.getIme() + '\t';
+        for(int i = 0; i < (longestNaziv / 4) - (a.getIme().length() / 4); i++)
+            izpis += '\t';
+        izpis += String.valueOf(a.getCenaBrezDDV()) +
+                "\t\t\t" + String.valueOf(a.getDDV()) + "%\t" + String.valueOf(a.getCenaZDDV()) + '\t';
+        return izpis;
+    }
+
+    public String izpisPosameznegaArtiklaBrezDDV(Artikel a, int longestDrzava, int longestNaziv, int longestId) {
+        String izpis;
+        izpis = String.valueOf(a.getId()) + '\t';
+        for(int i = 0; i < (longestId / 4) - (String.valueOf(a.getId()).length() / 4); i++)
+            izpis += '\t';
+        izpis += a.getEAN() + '\t' + a.getDrzava() + '\t';
+        for(int i = 0; i < (longestDrzava / 4) - (a.getDrzava().length() / 4); i++)
+            izpis += '\t';
+        izpis += a.getIme() + '\t';
+        for(int i = 0; i < (longestNaziv / 4) - (a.getIme().length() / 4); i++)
+            izpis += '\t';
+        izpis += String.valueOf(a.getCenaBrezDDV()) + "\t\t";
+        return izpis;
+    }
+
+    public String toString(boolean jeDavcniZavvezanec) {
+        int longestDrzava = 0;
+        int longestNaziv = 0;
+        int longestId = 0;
+        for (posamezniArtikel a : seznam) {
+            if(a.artikel.getDrzava().length() > longestDrzava)
+                longestDrzava = a.artikel.getDrzava().length();
+            if(a.artikel.getIme().length() > longestNaziv)
+                longestNaziv = a.artikel.getIme().length();
+            if(String.valueOf(a.artikel.getId()).length() > longestId)
+                longestId = String.valueOf(a.artikel.getId()).length();
+        }
+        String izpis = "ID\t";
+        for(int i = 0; i < longestId / 4; i++)
+            izpis += '\t';
+        izpis += "EAN\t\t\t\tDrzava\t";
+        for(int i = 1; i < longestDrzava / 4; i++)
+            izpis += '\t';
+        izpis += "Naziv\t";
+        for(int i = 1; i < longestNaziv / 4; i++)
+            izpis += '\t';
+        izpis += "Cena brez DDV\t";
+        if(jeDavcniZavvezanec)
+            izpis += "DDV\t\tCena z DDV\t";
+        izpis += "Kolicina\n";
+        for(int i = 0; i < seznam.size(); i++) {
+            if (jeDavcniZavvezanec)
+                izpis += izpisPosameznegaArtikla(seznam.get(i).artikel, longestDrzava, longestNaziv, longestId) +
+                        '\t' + String.valueOf(seznam.get(i).kolicina) + '\n';
+            else
+                izpis += izpisPosameznegaArtiklaBrezDDV(seznam.get(i).artikel, longestDrzava, longestNaziv, longestId) +
+                        '\t' + String.valueOf(seznam.get(i).kolicina) + '\n';
+        }
         return izpis;
     }
 

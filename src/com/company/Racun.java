@@ -11,24 +11,19 @@ public class Racun implements Searchable {
     private Date datum;
     private int davcnaStPodjetja;
     private boolean podjetjeDavcniZavezanec;
+    private boolean originalRacun;
     static private long lastId = 0;
 
     public Racun(Artikli artikli, String prodajalec, Date datum) {
-        this.artikli = artikli;
-        this.id = ++lastId;
-        this.prodajalec = prodajalec;
+        this(artikli, prodajalec);
         this.datum = datum;
-        izracunajCeno();
     }
 
     public Racun(Artikli artikli, String prodajalec, Date datum, Podjetje podjetje) {
-        this.artikli = artikli;
-        this.id = ++lastId;
-        this.prodajalec = prodajalec;
-        this.datum = datum;
+        this(artikli, prodajalec, datum);
+
         this.davcnaStPodjetja = podjetje.getDavcnaSt();
         this.podjetjeDavcniZavezanec = podjetje.isDavcniZavezanec();
-        izracunajCeno();
     }
 
     public Racun(Artikli artikli, String prodajalec) {
@@ -37,6 +32,7 @@ public class Racun implements Searchable {
         this.prodajalec = prodajalec;
         this.datum = new Date();
         izracunajCeno();
+        this.originalRacun = false;
     }
 
     public Racun(Artikli artikli, String prodajalec, Podjetje podjetje) {
@@ -47,6 +43,7 @@ public class Racun implements Searchable {
         this.davcnaStPodjetja = podjetje.getDavcnaSt();
         this.podjetjeDavcniZavezanec = podjetje.isDavcniZavezanec();
         izracunajCeno();
+        this.originalRacun = true;
     }
 
     public Racun() {
@@ -56,6 +53,7 @@ public class Racun implements Searchable {
         this.id = ++lastId;
         this.prodajalec = "";
         this.datum = new Date();
+        this.originalRacun = false;
     }
 
     public Racun(Racun R) {
@@ -68,15 +66,21 @@ public class Racun implements Searchable {
         this.davcnaStPodjetja = R.davcnaStPodjetja;
         this.podjetjeDavcniZavezanec = R.podjetjeDavcniZavezanec;
         setLastId(getLastId());
+        this.originalRacun = R.isOriginalRacun();
     }
 
     @Override
     public String toString() {
         String izpis = "Racun st. " + id + '\n';
-        izpis += artikli.toString();
-        izpis += "Cena brez DDV: " + cenaBrezDDV + '\n';
-        izpis += "Cena z DDV: " + cenaZDDV + '\n';
-        if(this.davcnaStPodjetja != 0) {
+        if(originalRacun == true && podjetjeDavcniZavezanec == false)
+            izpis += artikli.toString(false);
+        else
+            izpis += artikli.toString(true);
+        izpis += "\nCena brez DDV:\t" + String.format("%.02f", cenaBrezDDV) + '\n';
+        if(originalRacun == false || podjetjeDavcniZavezanec == true)
+            izpis += "Cena z DDV:\t\t" + String.format("%.02f", cenaZDDV) + '\n';
+        if(this.originalRacun) {
+            izpis += "\nOriginal racun:\n";
             izpis += "Davcna stevilka podjetja: " + davcnaStPodjetja + '\n';
             if (this.podjetjeDavcniZavezanec)
                 izpis += "Podjetje JE davcni zavezanec.\n";
@@ -143,6 +147,14 @@ public class Racun implements Searchable {
 
     public static void setLastId(long lastId) {
         Racun.lastId = lastId;
+    }
+
+    public boolean isOriginalRacun() {
+        return originalRacun;
+    }
+
+    public void setOriginalRacun(boolean originalRacun) {
+        this.originalRacun = originalRacun;
     }
 
     public void izracunajCeno() {

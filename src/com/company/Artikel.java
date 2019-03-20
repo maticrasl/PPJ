@@ -43,7 +43,7 @@ public class Artikel implements Searchable {
     @Override
     public String toString() {
         String izpis = this.id + "\t" + this.EAN + '\t' + this.drzava + '\t' + this.ime + '\t' + String.valueOf(this.cenaBrezDDV) +
-                '\t' + String.valueOf(this.DDV) + "%\t" + String.valueOf(this.cenaZDDV);
+                "\t\t\t" + String.valueOf(this.DDV) + "%\t" + String.valueOf(this.cenaZDDV) + "\t\t";
         return izpis;
     }
 
@@ -156,6 +156,7 @@ public class Artikel implements Searchable {
         else drzava = "N/A";
     }
 
+    @Override
     public boolean search(String s) {
         if(String.valueOf(id).contains(s) || EAN.contains(s) || ime.contains(s) || String.valueOf(cenaZDDV).contains(s) ||
                 String.valueOf(cenaBrezDDV).contains(s) || String.valueOf(DDV).contains(s))
