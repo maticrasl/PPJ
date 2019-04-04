@@ -19,6 +19,15 @@ public class Podjetje implements Searchable {
         this.davcniZavezanec = davcniZavezanec;
     }
 
+    public Podjetje() {
+        this.ime = "";
+        this.telSt = "";
+        this.email = "";
+        this.davcnaSt = 0;
+        this.maticnaSt = 0;
+        this.davcniZavezanec = false;
+    }
+
     @Override
     public String toString() {
         return "Podjetje{" +

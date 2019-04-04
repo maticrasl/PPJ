@@ -7,6 +7,7 @@ public class Artikel implements Searchable {
     private float cenaBrezDDV, cenaZDDV;
     private float DDV;
     private String drzava;
+    private float kolicina;
     static private long lastId = 0;
 
     public Artikel(String EAN, String ime, float cena, float DDV) {
@@ -15,20 +16,15 @@ public class Artikel implements Searchable {
         this.ime = ime;
         this.cenaBrezDDV = cena;
         this.DDV = DDV;
+        this.kolicina = 0.0f;
         this.cenaZDDV = cenaBrezDDV + cenaBrezDDV * (DDV / 100);
-        this.cenaZDDV = (float)((int)(cenaZDDV *100f ))/100f;
+        this.cenaZDDV = (float)((int)(cenaZDDV * 100f)) / 100f;
         setDrzavaFromEAN();
     }
 
-    public Artikel(String EAN, String ime, float cena, float DDV, String drzava) {
-        this.id = ++lastId;
-        this.EAN = EAN;
-        this.ime = ime;
-        this.cenaBrezDDV = cena;
-        this.DDV = DDV;
-        this.cenaZDDV = cenaBrezDDV + cenaBrezDDV * (DDV / 100);
-        this.cenaZDDV = (float)((int)(cenaZDDV *100f ))/100f;
-        this.drzava = drzava;
+    public Artikel(String EAN, String ime, float cena, float DDV, float kolicina) {
+        this(EAN, ime, cena, DDV);
+        this.kolicina = kolicina;
     }
 
     public Artikel() {
@@ -38,6 +34,8 @@ public class Artikel implements Searchable {
         this.cenaBrezDDV = 0.0f;
         this.DDV = 0.0f;
         this.cenaBrezDDV = 0.0f;
+        this.kolicina = 0.0f;
+        this.drzava = "N/A";
     }
 
     @Override
@@ -122,6 +120,16 @@ public class Artikel implements Searchable {
         this.drzava = drzava;
     }
 
+    public float getKolicina() {
+        return kolicina;
+    }
+
+    public void setKolicina(float kolicina) {
+        this.kolicina = kolicina;
+        if(this.EAN.charAt(0) == 2)
+            setEANFromTeza();
+    }
+
     public void setDrzavaFromEAN() {
         int kodaDrzave = 0;
         String[] e = EAN.split("");
@@ -131,8 +139,17 @@ public class Artikel implements Searchable {
         }
         if(kodaDrzave <= 139)
             drzava = "ZDA";
-        else if(kodaDrzave == 275)
-            drzava = "Palestine";
+        else if(kodaDrzave >= 200 && kodaDrzave <= 299) {
+            drzava = "Interni artikel";
+            if(EAN.length() <= 7) {
+                for (int i = EAN.length(); i < 13; i++)
+                    EAN += '0';
+                setEANFromTeza();
+                getTezaFromEAN();
+            }
+            else
+                getTezaFromEAN();
+        }
         else if(kodaDrzave >= 300 && kodaDrzave <= 379)
             drzava = "France and Monaco";
         else if(kodaDrzave == 380)
@@ -154,6 +171,109 @@ public class Artikel implements Searchable {
         else if(kodaDrzave >= 460 && kodaDrzave <= 469)
             drzava = "Russia";
         else drzava = "N/A";
+    }
+
+    public void getTezaFromEAN() {
+        int oddelek = 0;
+        int tipArtikla = 0;
+        float tezaArtikla = 0.0f;
+        String[] e = EAN.split("");
+        for(int i = 0; i < 3; i++) {
+            oddelek *= 10;
+            oddelek += Integer.parseInt(e[i]);
+        }
+        for(int i = 3; i < 7; i++) {
+            tipArtikla *= 10;
+            tipArtikla += Integer.parseInt(e[i]);
+        }
+        for(int i = 7; i < 12; i++) {
+            tezaArtikla *= 10.0f;
+            tezaArtikla += Integer.parseInt(e[i]);
+        }
+        tezaArtikla /= 1000;
+        switch(oddelek) {
+            case 200:       //Sadje
+                switch(tipArtikla) {
+                    case 1000:      //Jabolka
+                        this.ime = "Jabolka";
+                        break;
+                    case 1001:
+                        this.ime = "Hruske";
+                        break;
+                    case 1002:
+                        this.ime = "Limone";
+                        break;
+                    case 1003:
+                        this.ime = "Lubenica";
+                        break;
+                }
+            case 201:       //Zelenjava
+                switch(tipArtikla) {
+                    case 2000:
+                        this.ime = "Paprika";
+                        break;
+                    case 2001:
+                        this.ime = "Paradiznik";
+                        break;
+                    case 2002:
+                        this.ime = "Kumare";
+                        break;
+                    case 2003:
+                        this.ime = "Korenje";
+                        break;
+                }
+            case 202:       //Meso
+                switch(tipArtikla) {
+                    case 3000:
+                        this.ime = "Piscancje prsi";
+                        break;
+                    case 3001:
+                        this.ime = "Mleto gov. meso";
+                        break;
+                    case 3002:
+                        this.ime = "Krvavice";
+                        break;
+                }
+        }
+        kolicina = tezaArtikla;
+    }
+
+    public String setEanCheckDigit() {
+        String[] d = EAN.split("");
+        int[] digits = new int[13];
+        for(short i = 0; i < 13; i++) {
+            digits[i] = ((int)EAN.charAt(i)) - 48;
+            if(i % 2 == 1 && i < 12)
+                digits[i] *= 3;
+        }
+        int sum = 0;
+        for(int i = 0; i < 12; i++)
+            sum += digits[i];
+        int lastDigit = (10 - (sum % 10)) % 10;
+        d[12] = String.valueOf(lastDigit);
+        String noviEAN = "";
+        for(int i = 0; i < 13; i++)
+            noviEAN += d[i];
+        EAN = noviEAN;
+
+        return noviEAN;
+    }
+
+    public void setEANFromTeza() {
+        for(int i = EAN.length(); i < 13; i++)
+            EAN += '0';
+        String[] d = EAN.split("");
+        short[] digits = new short[5];
+        int TEZA = (int)(kolicina * 1000);
+        for(int i = 11; i > 6; i--) {
+            d[i] = String.valueOf(TEZA % 10);
+            TEZA /= 10;
+        }
+        String noviEAN = "";
+        for(int i = 0; i < 13; i++)
+            noviEAN += d[i];
+        EAN = noviEAN;
+        EAN = setEanCheckDigit();
     }
 
     @Override
