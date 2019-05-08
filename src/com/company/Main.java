@@ -1,15 +1,43 @@
 package com.company;
 
+import database.DBHelper;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-
     public static void main(String[] args) {
-	// write your code here
+
+
+
+        try(Connection conn = DBHelper.getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM sakila.film");) {
+
+            ResultSet rs =  ps.executeQuery();
+
+            while (rs.next()) {
+
+                String title = rs.getString("title");
+                System.out.println(title);
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // write your code here
         Podjetje P1 = new Podjetje("Talum", "+38630 808 888", "info@talum.si", 45645645, Long.valueOf("6225480070"), true);
         Podjetje P2 = new Podjetje("Perutnina Ptuj d.d.", "+38630 708 888", "info@pp.si", 45655645, Long.valueOf("6255480070"), false);
         Podjetje P3 = new Podjetje("Henkel Maribor d.o.o.", "+3862 2222100", "henkel.slovenija@henkel.com", 58665765, Long.valueOf("6261752000"), true);
