@@ -1,8 +1,12 @@
 package com.company;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.UUID;
 
 public class Podjetje implements Searchable {
+    private byte[] id;;
     private String ime;
     private String telSt;
     private String email;
@@ -11,6 +15,7 @@ public class Podjetje implements Searchable {
     private boolean davcniZavezanec;
 
     public Podjetje(String ime, String telSt, String email, int davcnaSt, long maticnaSt, boolean davcniZavezanec) {
+        setUUID();
         this.ime = ime;
         this.telSt = telSt;
         this.email = email;
@@ -20,6 +25,7 @@ public class Podjetje implements Searchable {
     }
 
     public Podjetje() {
+        setUUID();
         this.ime = "";
         this.telSt = "";
         this.email = "";
@@ -38,6 +44,14 @@ public class Podjetje implements Searchable {
                 ", maticnaSt=" + maticnaSt +
                 ", davcniZavezanec=" + davcniZavezanec +
                 '}';
+    }
+
+    public byte[] getId() {
+        return id;
+    }
+
+    public void setId(byte[] id) {
+        this.id = id;
     }
 
     public String getIme() {
@@ -93,6 +107,12 @@ public class Podjetje implements Searchable {
                 String.valueOf(maticnaSt).contains(s) || String.valueOf(davcniZavezanec).contains(s))
             return true;
         return false;
+    }
+
+    private void setUUID() {
+        UUID uuid = UUID.randomUUID();
+        this.id = new byte[16];
+        ByteBuffer.wrap(this.id).order(ByteOrder.BIG_ENDIAN).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits());
     }
 }
 

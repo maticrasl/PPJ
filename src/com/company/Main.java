@@ -1,42 +1,18 @@
 package com.company;
 
+import DAO.MySqlArticle;
+import DAO.MySqlCompany;
+import DAO.MySqlInvoice;
 import database.DBHelper;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-
-
-
-        try(Connection conn = DBHelper.getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM sakila.film");) {
-
-            ResultSet rs =  ps.executeQuery();
-
-            while (rs.next()) {
-
-                String title = rs.getString("title");
-                System.out.println(title);
-            }
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         // write your code here
         Podjetje P1 = new Podjetje("Talum", "+38630 808 888", "info@talum.si", 45645645, Long.valueOf("6225480070"), true);
         Podjetje P2 = new Podjetje("Perutnina Ptuj d.d.", "+38630 708 888", "info@pp.si", 45655645, Long.valueOf("6255480070"), false);
@@ -45,9 +21,9 @@ public class Main {
         Companies Podjetja = new Companies();
         /*Podjetja.add(P1);
         Podjetja.add(P2);
-        Podjetja.add(P3);
+        Podjetja.add(P3);*/
 
-        Podjetja.toJson();*/              //Pisanje seznama podjetij v datoteko
+        //Podjetja.toJson();              //Pisanje seznama podjetij v datoteko
         Podjetja.fromJson();            //Branje seznama podjetij iz datoteke
 
         Artikel A = new Artikel("1103526350767", "Zobna scetka", 12.0f, 22.0f);
@@ -67,8 +43,8 @@ public class Main {
         Artikel Ar11 = new Artikel("2012002", "", 3.79f, 22);
 
         Artikli VsiArtikli = new Artikli();
-
-        /*VsiArtikli.addArtikel(Ar1, 1);
+/*
+        VsiArtikli.addArtikel(Ar1, 1);
         VsiArtikli.addArtikel(Ar2, 1);
         VsiArtikli.addArtikel(Ar3, 1);
         VsiArtikli.addArtikel(Ar2, 1);
@@ -82,7 +58,9 @@ public class Main {
         VsiArtikli.addArtikel(Ar9, 1);
         VsiArtikli.addArtikel(Ar10, 1);
         VsiArtikli.addArtikel(Ar11, 1);
-        VsiArtikli.toJson();*/                //Pisanje seznama artiklov v datoteko
+
+        VsiArtikli.toJson();                //Pisanje seznama artiklov v datoteko
+        */
         VsiArtikli.fromJson();              //Branje seznama artiklov iz datoteke
 
         //KUPONI
@@ -98,36 +76,36 @@ public class Main {
         Kuponi.add(k4);
         Kuponi.add(k5);
 
-        Racun R1 = new Racun(VsiArtikli, Kuponi, "Sabina K.");
-        R1.add(Ar1.getEAN(), 1);
-        R1.add(Ar2.getEAN(), 1);
-        R1.add(Ar3.getEAN(), 1);
-        R1.add(Ar4.getEAN(), 1);
-        R1.add(Ar5.getEAN(), 1);
-        R1.add(Ar6.getEAN(), 1);
-        R1.add(Ar7.getEAN(), 1);
-        R1.add(Ar8.getEAN(), 1);
-        R1.add(Ar10.getEAN(), 0.8);
-        R1.add(Ar11.getEAN(), 2.400);
-        R1.add(Ar5.getEAN(), 4);
-        R1.add(Ar4.getEAN(), -1);
-        R1.add(k1.getEAN(), 1);
-        R1.add(k3.getEAN(), 1);
-        R1.add(k5.getEAN(), 1);
+        Racun R1 = new Racun(VsiArtikli, Kuponi, "Sabina K.", Podjetja.get(2));
+        R1.add(VsiArtikli.get(0), 1);
+        R1.add(VsiArtikli.get(1), 1);
+        R1.add(VsiArtikli.get(2), 1);
+        R1.add(VsiArtikli.get(3), 1);
+        R1.add(VsiArtikli.get(4), 1);
+        R1.add(VsiArtikli.get(5), 1);
+        R1.add(VsiArtikli.get(6), 1);
+        R1.add(VsiArtikli.get(7), 1);
+        R1.add(VsiArtikli.get(9), 0.8);
+        R1.add(VsiArtikli.get(10), 2.400);
+        R1.add(VsiArtikli.get(4), 4);
+        R1.add(VsiArtikli.get(3), -1);
+        R1.add(k1);
+        R1.add(k3);
+        R1.add(k5);
 
 
         System.out.print("Racun 1: \n");
         System.out.print(R1.toString());
 
-        Racun R2 = new Racun(VsiArtikli, Kuponi, "GABROVEC LIDIJA", Podjetja.get(0));
-        R2.add(Ar9.getEAN(), 2);
-        R2.add(k2.getEAN(), 1);
-        R2.add(k4.getEAN(), 1);
-        R2.add(k5.getEAN(), 1);
+        Racun R2 = new Racun(VsiArtikli, Kuponi, "GABROVEC LIDIJA", Podjetja.get(2), Podjetja.get(0));
+        R2.add(VsiArtikli.get(8), 2);
+        R2.add(k2);
+        R2.add(k4);
+        R2.add(k5);
 
-        Racun R3 = new Racun(VsiArtikli, Kuponi, "Sabina K.", Podjetja.get(1));
-        R3.add(Ar1.getEAN(), 2);
-        R3.add(k1.getEAN(), 1);
+        Racun R3 = new Racun(VsiArtikli, Kuponi, "Sabina K.", Podjetja.get(2), Podjetja.get(1));
+        R3.add(VsiArtikli.get(0), 2);
+        R3.add(k1);
         //System.out.print("\nRacun 2: \n");
         //System.out.print(R2.toString());
         
@@ -143,20 +121,110 @@ public class Main {
         /*inv.add(R1);
         inv.add(R2);
         inv.add(R3);
-        inv.toJson();*/
 
+        inv.toJson();*/
         inv.fromJson();
+
         System.out.print(inv.get(0).toString());
 
         System.out.print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-        //System.out.println("Prava koda: " + A.checkDigit("6291041500213"));
-        //System.out.println("Napacna koda: " + A.checkDigit("6291041500214"));
-        //System.out.println("Prava koda: " + A.checkDigit("9789616555104"));
+        //napolniArtikleIzDatoteke("Grocery_UPC_Database.csv");
+        //napolniArtikleIzDatoteke("en.openfoodfacts.org.products.csv");
 
-        //System.out.println(A.search("scet"));
-        //System.out.println(A.search("zobna"));
-        //System.out.println(A.search("Zobna"));
+        MySqlArticle MA = new MySqlArticle();
+        Artikel a1 = MA.getByEAN("00000000000017");
+        //Artikel a2 = MA.getById(UUID.fromString("78bf57fb-d553-4960-b34d-327199b37b9e"));
+        System.out.println(a1.toString());
+        //System.out.println(a2.toString());
+
+        MySqlCompany MC = new MySqlCompany();
+        MC.insert(Podjetja.get(0));
+        MC.insert(Podjetja.get(1));
+        MC.insert(Podjetja.get(2));
+
+        Podjetje CC = MC.getByIme("Talum");
+        System.out.println(CC.toString());
+
+        MySqlInvoice MI = new MySqlInvoice();
+        MI.insert(inv.get(0));
+        MI.insert(inv.get(1));
+        MI.insert(inv.get(2));
+    }
+
+    static void napolniArtikleIzDatoteke(String imeDatoteke) {
+        System.out.println("Polnjenje baze iz datoteke:");
+        Random r = new Random();
+        try (BufferedReader br = new BufferedReader(new FileReader(imeDatoteke))) {
+            try(Connection conn = DBHelper.getConnection();) {
+                conn.setAutoCommit(false);
+                String line;
+                String[] parts;
+
+                int i = 0;
+
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO mydb.article(id, EAN, ime, cenaBrezDDV, cenaZDDV, DDV, drzava, zaloga, deleted, created) VALUES (UUID_TO_BIN(UUID()), ?, ?, ?, ?, ?, ?, ?, FALSE, CURRENT_TIMESTAMP());");
+
+                /* Grocery_UPC_Database.csv
+                line = br.readLine();
+                while((line = br.readLine()) != null) {
+                    for(int j = 0; j < 1000 && line != null; j++) {
+                        parts = line.split(";");
+                        Artikel temp = new Artikel(parts[0], parts[1], (float)(r.nextInt(100000) + 1) / 100, 22);
+                        temp.setKolicina(1000);
+                        if (temp.getDrzava() != "Interni artikel" && temp.testEanCheckDigit()) {
+                            ps.setString(1, temp.getEAN());
+                            ps.setString(2, temp.getIme());
+                            ps.setFloat(3, temp.getCenaBrezDDV());
+                            ps.setFloat(4, temp.getCenaZDDV());
+                            ps.setFloat(5, temp.getDDV());
+                            ps.setString(6, temp.getDrzava());
+                            ps.setFloat(7, temp.getKolicina());
+                            ps.addBatch();
+                            line = br.readLine();
+                        }
+                    }
+                    ps.executeBatch();
+                    conn.commit();
+                    System.out.println(++i);
+                }
+                */
+
+                /*en.openfoodfacts.org.products.csv*/
+                line = br.readLine();
+                while((line = br.readLine()) != null) {
+                    for(int j = 0; j < 1000 && line != null; j++) {
+                        parts = line.split("\t");
+                        Artikel temp = new Artikel(parts[0], parts[7], (float)(r.nextInt(100000) + 1) / 100, 22);
+                        temp.setKolicina(1000);
+                        if (temp.getDrzava() != "Interni artikel" && temp.getEAN().length() <= 14 && temp.testEanCheckDigit()) {
+                            ps.setString(1, temp.getEAN());
+                            ps.setString(2, temp.getIme());
+                            ps.setFloat(3, temp.getCenaBrezDDV());
+                            ps.setFloat(4, temp.getCenaZDDV());
+                            ps.setFloat(5, temp.getDDV());
+                            ps.setString(6, temp.getDrzava());
+                            ps.setFloat(7, temp.getKolicina());
+                            ps.addBatch();
+                            line = br.readLine();
+                        }
+                    }
+                    ps.executeBatch();
+                    conn.commit();
+                    System.out.println(++i);
+                }
+
+
+
+
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

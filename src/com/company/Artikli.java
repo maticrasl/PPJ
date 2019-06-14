@@ -29,8 +29,8 @@ public class Artikli implements JsonSupport {
         izpis += a.getIme() + '\t';
         for(int i = 0; i < (longestNaziv / 4) - (a.getIme().length() / 4); i++)
             izpis += '\t';
-        izpis += String.valueOf(a.getCenaBrezDDV()) +
-                "\t\t\t" + String.valueOf(a.getDDV()) + "%\t" + String.valueOf(a.getCenaZDDV()) + '\t';
+        izpis += a.getCenaBrezDDV() +
+                "\t\t\t" + a.getDDV() + "%\t" + a.getCenaZDDV() + '\t';
         return izpis;
     }
 
@@ -45,7 +45,7 @@ public class Artikli implements JsonSupport {
         izpis += a.getIme() + '\t';
         for(int i = 0; i < (longestNaziv / 4) - (a.getIme().length() / 4); i++)
             izpis += '\t';
-        izpis += String.valueOf(a.getCenaBrezDDV()) + "\t\t";
+        izpis += a.getCenaBrezDDV() + "\t\t";
         return izpis;
     }
 
@@ -61,9 +61,7 @@ public class Artikli implements JsonSupport {
             if(String.valueOf(a.getId()).length() > longestId)
                 longestId = String.valueOf(a.getId()).length();
         }
-        String izpis = "ID\t";
-        for(int i = 0; i < longestId / 4; i++)
-            izpis += '\t';
+        String izpis = "";
         izpis += "EAN\t\t\t\tDrzava\t";
         for(int i = 1; i < longestDrzava / 4; i++)
             izpis += '\t';
@@ -78,19 +76,19 @@ public class Artikli implements JsonSupport {
             if (jeDavcniZavezanec) {
                 if(seznam.get(i).getEAN().charAt(0) != '2')
                     izpis += izpisPosameznegaArtikla(seznam.get(i), longestDrzava, longestNaziv, longestId) +
-                            '\t' + String.valueOf(seznam.get(i).getKolicina()) + '\n';
+                            '\t' + seznam.get(i).getKolicina() + '\n';
                 else
                     izpis += izpisPosameznegaArtikla(seznam.get(i), longestDrzava, longestNaziv, longestId) +
-                            '\t' + String.valueOf((float)(seznam.get(i).getKolicina())) + " kg\n";
+                            '\t' + seznam.get(i).getKolicina() + " kg\n";
             }
             else {
                 if(seznam.get(i).getKolicina() == 0.0f) {
                     izpis += izpisPosameznegaArtiklaBrezDDV(seznam.get(i), longestDrzava, longestNaziv, longestId) +
-                            '\t' + String.valueOf(seznam.get(i).getKolicina()) + '\n';
+                            '\t' + seznam.get(i).getKolicina() + '\n';
                 }
                 else {
                     izpis += izpisPosameznegaArtiklaBrezDDV(seznam.get(i), longestDrzava, longestNaziv, longestId) +
-                            '\t' + String.valueOf((float)(seznam.get(i).getKolicina())) + " kg\n";
+                            '\t' + seznam.get(i).getKolicina() + " kg\n";
                 }
             }
         }
@@ -179,12 +177,12 @@ public class Artikli implements JsonSupport {
         }
     }
 
-    public long getId(int index) {
+    public byte[] getId(int index) {
         if(index < seznam.size())
             return seznam.get(index).getId();
         else {
             System.out.println("NAPAKA! indeks ne obstaja!");
-            return -1;
+            return null;
         }
     }
 

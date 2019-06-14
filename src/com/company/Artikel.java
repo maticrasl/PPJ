@@ -1,17 +1,20 @@
 package com.company;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.UUID;
+
 public class Artikel implements Searchable {
-    private long id;
+    private byte[] id;;
     private String EAN;
     private String ime;
     private float cenaBrezDDV, cenaZDDV;
     private float DDV;
     private String drzava;
     private float kolicina;
-    static private long lastId = 0;
 
     public Artikel(String EAN, String ime, float cena, float DDV) {
-        this.id = ++lastId;
+        setUUID();
         this.EAN = EAN;
         this.ime = ime;
         this.cenaBrezDDV = cena;
@@ -28,7 +31,7 @@ public class Artikel implements Searchable {
     }
 
     public Artikel() {
-        this.id = ++lastId;
+        setUUID();
         this.EAN = "0000000000000";
         this.ime = "";
         this.cenaBrezDDV = 0.0f;
@@ -38,9 +41,15 @@ public class Artikel implements Searchable {
         this.drzava = "N/A";
     }
 
+    private void setUUID() {
+        UUID uuid = UUID.randomUUID();
+        this.id = new byte[16];
+        ByteBuffer.wrap(this.id).order(ByteOrder.BIG_ENDIAN).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits());
+    }
+
     @Override
     public String toString() {
-        String izpis = this.id + "\t" + this.EAN + '\t' + this.drzava + '\t' + this.ime + '\t' + String.valueOf(this.cenaBrezDDV) +
+        String izpis = this.EAN + '\t' + this.drzava + '\t' + this.ime + '\t' + String.valueOf(this.cenaBrezDDV) +
                 "\t\t\t" + String.valueOf(this.DDV) + "%\t" + String.valueOf(this.cenaZDDV) + "\t\t";
         return izpis;
     }
@@ -64,11 +73,11 @@ public class Artikel implements Searchable {
         return false;
     }
 
-    public long getId() {
+    public byte[] getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(byte[] id) {
         this.id = id;
     }
 
@@ -239,24 +248,50 @@ public class Artikel implements Searchable {
     }
 
     public String setEanCheckDigit() {
+        if(EAN.length() < 14)
+            for(int i = EAN.length(); i < 14; i++)
+                EAN = "0" + EAN;
+
         String[] d = EAN.split("");
-        int[] digits = new int[13];
-        for(short i = 0; i < 13; i++) {
+        int[] digits = new int[14];
+        for(short i = 0; i < 14; i++) {
             digits[i] = ((int)EAN.charAt(i)) - 48;
-            if(i % 2 == 1 && i < 12)
+            if(i % 2 == 1 && i < 13)
                 digits[i] *= 3;
         }
         int sum = 0;
-        for(int i = 0; i < 12; i++)
+        for(int i = 0; i < 13; i++)
             sum += digits[i];
         int lastDigit = (10 - (sum % 10)) % 10;
         d[12] = String.valueOf(lastDigit);
         String noviEAN = "";
-        for(int i = 0; i < 13; i++)
+        for(int i = 0; i < 14; i++)
             noviEAN += d[i];
         EAN = noviEAN;
 
         return noviEAN;
+    }
+
+    public boolean testEanCheckDigit() {
+        if(EAN.length() < 14)
+            for(int i = EAN.length(); i < 14; i++)
+                EAN = "0" + EAN;
+
+        String[] d = EAN.split("");
+        int[] digits = new int[14];
+        for(short i = 0; i < 14; i++) {
+            digits[i] = ((int)EAN.charAt(i)) - 48;
+            if(i % 2 == 0 && i < 13)
+                digits[i] *= 3;
+        }
+        int sum = 0;
+        for(int i = 0; i < 13; i++)
+            sum += digits[i];
+        int lastDigit = (10 - (sum % 10)) % 10;
+
+        if(lastDigit == EAN.charAt(13) - 48)
+            return true;
+        return false;
     }
 
     public void setEANFromTeza() {
@@ -282,5 +317,13 @@ public class Artikel implements Searchable {
                 String.valueOf(cenaBrezDDV).contains(s) || String.valueOf(DDV).contains(s))
             return true;
         return false;
+    }
+
+    public static String getGuidFromByteArray(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        long high = bb.getLong();
+        long low = bb.getLong();
+        UUID uuid = new UUID(high, low);
+        return uuid.toString();
     }
 }

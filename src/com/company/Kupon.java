@@ -30,6 +30,10 @@ public class Kupon {
         return popust;
     }
 
+    public void setPopust(double p) {
+        this.popust = p;
+    }
+
     public String getEANIzdelka() {
         return EANIzdelka;
     }

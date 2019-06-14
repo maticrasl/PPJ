@@ -1,8 +1,11 @@
 package com.company;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class Racun implements Searchable {
     private Artikli vsiArtikli;
@@ -12,40 +15,39 @@ public class Racun implements Searchable {
     private double cenaBrezDDV;
     private double cenaZDDV;
     private double popust;
-    private long id;
+    private byte[] id;
     private String prodajalec;
     private Date datum;
-    private int davcnaStPodjetja;
-    private boolean podjetjeDavcniZavezanec;
-    private boolean originalRacun;
-    static private long lastId = 0;
+    private Podjetje podjetjeProdajalec;
+    private Podjetje podjetjeKupec;
 
-    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Date datum) {
-        this(vsiArtikli, vsiKuponi, prodajalec);
+    private boolean originalRacun;
+
+    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Podjetje podjetjeProdajalec, Date datum) {
+        this(vsiArtikli, vsiKuponi, prodajalec, podjetjeProdajalec);
         this.datum = datum;
     }
 
-    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Date datum, Podjetje podjetje) {
-        this(vsiArtikli, vsiKuponi, prodajalec, datum);
-        this.davcnaStPodjetja = podjetje.getDavcnaSt();
-        this.podjetjeDavcniZavezanec = podjetje.isDavcniZavezanec();
+    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Date datum, Podjetje podjetjeProdajalec, Podjetje podjetjeKupec) {
+        this(vsiArtikli, vsiKuponi, prodajalec, podjetjeProdajalec, datum);
+        this.podjetjeKupec = podjetjeKupec;
     }
 
-    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec) {
+    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Podjetje podjetjeProdajalec) {
         this.vsiArtikli = vsiArtikli;
         this.mojiArtikli = new Artikli();
         this.vsiKuponi = vsiKuponi;
         this.mojiKuponi = new ArrayList<>();
-        this.id = ++lastId;
+        setUUID();
         this.prodajalec = prodajalec;
         this.datum = new Date();
         this.originalRacun = false;
+        this.podjetjeProdajalec = podjetjeProdajalec;
     }
 
-    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Podjetje podjetje) {
-        this(vsiArtikli, vsiKuponi, prodajalec);
-        this.davcnaStPodjetja = podjetje.getDavcnaSt();
-        this.podjetjeDavcniZavezanec = podjetje.isDavcniZavezanec();
+    public Racun(Artikli vsiArtikli, List<Kupon> vsiKuponi, String prodajalec, Podjetje podjetjeProdajalec, Podjetje podjetjeKupec) {
+        this(vsiArtikli, vsiKuponi, prodajalec, podjetjeProdajalec);
+        this.podjetjeKupec = podjetjeKupec;
         this.originalRacun = true;
     }
 
@@ -56,7 +58,7 @@ public class Racun implements Searchable {
         this.mojiKuponi = new ArrayList<>();
         this.cenaBrezDDV = 0.0;
         this.cenaZDDV = 0.0;
-        this.id = ++lastId;
+        setUUID();
         this.prodajalec = "";
         this.datum = new Date();
         this.originalRacun = false;
@@ -69,54 +71,69 @@ public class Racun implements Searchable {
         this.mojiKuponi = R.mojiKuponi;
         this.cenaBrezDDV = R.cenaBrezDDV;
         this.cenaZDDV = R.cenaZDDV;
-        this.id = ++lastId;
+        setUUID();
         this.prodajalec = R.prodajalec;
         this.datum = R.datum;
-        this.davcnaStPodjetja = R.davcnaStPodjetja;
-        this.podjetjeDavcniZavezanec = R.podjetjeDavcniZavezanec;
-        setLastId(getLastId());
+        this.podjetjeProdajalec = R.podjetjeProdajalec;
+        this.podjetjeKupec = R.podjetjeKupec;
         this.originalRacun = R.isOriginalRacun();
     }
 
-    public void add(String EAN, double kolicina) {
+    private void setUUID() {
+        UUID uuid = UUID.randomUUID();
+        this.id = new byte[16];
+        ByteBuffer.wrap(this.id).order(ByteOrder.BIG_ENDIAN).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits());
+    }
+
+    public Podjetje getPodjetjeProdajalec() {
+        return podjetjeProdajalec;
+    }
+
+    public void setPodjetjeProdajalec(Podjetje podjetjeProdajalec) {
+        this.podjetjeProdajalec = podjetjeProdajalec;
+    }
+
+    public Podjetje getPodjetjeKupec() {
+        return podjetjeKupec;
+    }
+
+    public void setPodjetjeKupec(Podjetje podjetjeKupec) {
+        this.podjetjeKupec = podjetjeKupec;
+    }
+
+    public void add(Artikel ar, double kolicina) {
         String vrstaIzdelka = "";
-        String iskaniEAN;
         for(int i = 0; i < 3; i++)
-            vrstaIzdelka += EAN.charAt(i);
+            vrstaIzdelka += ar.getEAN().charAt(i);
         if(Integer.parseInt(vrstaIzdelka) >= 200 && Integer.parseInt(vrstaIzdelka) <= 299) {        //Interni izdelek
             for(int i = 3; i < 7; i++) {
-                vrstaIzdelka += EAN.charAt(i);
+                vrstaIzdelka += ar.getEAN().charAt(i);
             }
-            for(int i = 0; i < vsiArtikli.count(); i++) {
-                if(vsiArtikli.getEAN(i).contains(vrstaIzdelka)) {
-                    mojiArtikli.addArtikel(vsiArtikli.get(i), kolicina);
-                    break;
-                }
-            }
+            mojiArtikli.addArtikel(ar, kolicina);
         }
         else if(Integer.parseInt(vrstaIzdelka) == 981) {        //Kupon
             for(int i = 0; i < vsiKuponi.size(); i++) {
-                if(vsiKuponi.get(i).getEAN() == EAN) {
+                if(vsiKuponi.get(i).getEAN() == ar.getEAN()) {
                     mojiKuponi.add(vsiKuponi.get(i));
                 }
             }
         }
         else {      //Navaden izdelek
             int stVsehArtiklov = vsiArtikli.count();
-            for(int i = 0; i < stVsehArtiklov; i++) {
-                if(vsiArtikli.getEAN(i) == EAN) {
-                    mojiArtikli.addArtikel(vsiArtikli.get(i), kolicina);
-                    break;
-                }
-            }
+            mojiArtikli.addArtikel(ar, kolicina);
         }
+    }
+
+    public void add(Kupon k) {
+        mojiKuponi.add(k);
     }
 
     @Override
     public String toString() {
         izracunajCeno();
-        String izpis = "Racun st. " + id + '\n';
-        if(originalRacun == true && podjetjeDavcniZavezanec == false)
+        String izpis = '\t' + this.podjetjeProdajalec.getIme() + '\n';
+        izpis += "Racun st. " + id + '\n';
+        if(originalRacun == true && podjetjeKupec.isDavcniZavezanec() == false)
             izpis += mojiArtikli.toString(false);
         else
             izpis += mojiArtikli.toString(true);
@@ -142,12 +159,12 @@ public class Racun implements Searchable {
             }
         }
         izpis += "\nCena brez DDV:\t" + String.format("%.02f", cenaBrezDDV) + '\n';
-        if(originalRacun == false || podjetjeDavcniZavezanec == true)
+        if(originalRacun == false || podjetjeKupec.isDavcniZavezanec() == true)
             izpis += "Cena z DDV:\t\t" + String.format("%.02f", cenaZDDV) + '\n';
         if(this.originalRacun) {
             izpis += "\nOriginal racun:\n";
-            izpis += "Davcna stevilka podjetja: " + davcnaStPodjetja + '\n';
-            if (this.podjetjeDavcniZavezanec)
+            izpis += "Davcna stevilka podjetja: " + podjetjeKupec.getDavcnaSt() + '\n';
+            if (this.podjetjeKupec.isDavcniZavezanec())
                 izpis += "Podjetje JE davcni zavezanec.\n";
             else
                 izpis += "Podjetje NI davcni zavezanec.\n";
@@ -182,11 +199,19 @@ public class Racun implements Searchable {
         this.cenaZDDV = cenaZDDV;
     }
 
-    public long getId() {
+    public double getPopust() {
+        return popust;
+    }
+
+    public void setPopust(double p) {
+        this.popust = p;
+    }
+
+    public byte[] getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(byte[] id) {
         this.id = id;
     }
 
@@ -206,12 +231,12 @@ public class Racun implements Searchable {
         this.datum = datum;
     }
 
-    public static long getLastId() {
-        return lastId;
+    public List<Kupon> getMojiKuponi() {
+        return mojiKuponi;
     }
 
-    public static void setLastId(long lastId) {
-        Racun.lastId = lastId;
+    public void setMojiKuponi(List<Kupon> k) {
+        mojiKuponi = k;
     }
 
     public boolean isOriginalRacun() {
@@ -262,7 +287,8 @@ public class Racun implements Searchable {
     }
     public boolean search(String s) {
         if(String.valueOf(cenaBrezDDV).contains(s) || String.valueOf(cenaZDDV).contains(s) ||
-                String.valueOf(id).contains(s) || prodajalec.contains(s) || String.valueOf(datum).contains(s) || String.valueOf(davcnaStPodjetja).contains(s))
+                String.valueOf(id).contains(s) || prodajalec.contains(s) || String.valueOf(datum).contains(s) ||
+                String.valueOf(podjetjeProdajalec.getDavcnaSt()).contains(s) || String.valueOf(podjetjeKupec.getDavcnaSt()).contains(s))
             return true;
         return false;
     }
